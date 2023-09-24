@@ -4,20 +4,6 @@ let mongodb = require("mongodb");
 let app = express();
 app.use(bodyParser.json());
 
-let distDir = __dirname + "/dist/";
-app.use(express.static(distDir));
-
-let db;
-mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://0.0.0.0:27017/").then(client => {
-    db = client.db();
-    console.log("База данных подключена");
-
-    let server = app.listen(process.env.PORT || 8080, function () {
-        let port = server.address().port;
-        console.log("Приложение запущено на порту", port);
-    });
-});
-
 // Маршруты API
 function handleError(res, reason, message, code) {
     console.log("Ошибка: " + reason);
@@ -72,5 +58,17 @@ app.delete("/api/contacts/:id", function(req, res) {
     const collection = db.collection('contacts');
     collection.deleteOne({_id: new mongodb.ObjectId(req.params.id)}, function(result) {
         res.json({message: 'success'});
+    });
+});
+
+
+let db;
+mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://0.0.0.0:27017/",).then(client => {
+    db = client.db();
+    console.log("База данных подключена");
+
+    let server = app.listen(process.env.PORT || 8080, function () {
+        let port = server.address().port;
+        console.log("Приложение запущено на порту", port);
     });
 });
